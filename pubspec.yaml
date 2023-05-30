@@ -1,4 +1,4 @@
-name: serveTestData
+name: server
 description: Sample HTTP REST API with static JSON file as backend
 homepage: https://devowl.de
 
@@ -7,6 +7,7 @@ environment:
 
 dependencies:
   path: ^1.6.2
+  uuid: ^3.0.7
 
 dev_dependencies:
   pedantic: ^1.7.0

@@ -1,5 +1,9 @@
+import 'dart:math';
+
+import 'package:uuid/uuid.dart';
+
 class CompanyContact {
-  final int id;
+  final String id;
   final String companyName;
   final String firstName;
   final String lastName;
@@ -15,11 +19,11 @@ class CompanyContact {
 
   factory CompanyContact.fromJson(Map<String, dynamic> json) {
     return CompanyContact(
-      json['id'] as int,
-      json['companyName'] as String,
-      json['firstName'] as String,
-      json['lastName'] as String,
-      json['phone'] as String,
+      json['id'] != null ? json['id'] as String : Uuid().v4(),
+      json['companyName'] != null ? json['companyName'] as String : 'null',
+      json['firstName'] != null ? json['firstName'] as String : 'null',
+      json['lastName'] != null ? json['lastName'] as String : 'null',
+      json['phone'] != null ? json['phone'] as String : 'null',
     );
   }
 
