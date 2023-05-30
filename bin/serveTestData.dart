@@ -6,10 +6,6 @@ import 'package:path/path.dart' as path;
 
 import 'company_contact.dart';
 
-//SECTION 1 -- Build the file URL
-final targetFile =
-    File(path.join(path.dirname(Platform.script.toFilePath()), 'data.json'));
-
 //SECTOIN 2 -- Our response model
 
 class ResponseModel {
@@ -19,10 +15,7 @@ class ResponseModel {
   ResponseModel(this.totalRows, this.rows);
 
   Map<String, dynamic> toJson() {
-    return {
-      'totalRows': totalRows,
-      'rows': rows.map((e) => e.toJson()).toList()
-    };
+    return {'totalRows': totalRows, 'rows': rows.map((e) => e.toJson()).toList()};
   }
 }
 
@@ -54,16 +47,24 @@ int sortContacts(CompanyContact a, CompanyContact b, int sortIndex, bool asc) {
   return result;
 }
 
-// SECTION 4 -- The application startup code and webserver code
+String getPath(String path) {
+  if (path.contains('.dart_tool\\pub\\bin\\serveTestData')) {
+    return path.replaceAll('.dart_tool\\pub\\bin\\serveTestData', '\\bin');
+  } else {
+    return 'asd';
+  }
+}
 
 Future main() async {
+  // Get the file with JSON.
+  final context = path.Context(style: path.Style.windows);
+  final targetFile = File(context.normalize(path.join(getPath(path.dirname(Platform.script.toFilePath())), 'data.json')));
+
   late final HttpServer server;
   late final List<CompanyContact> fileContent;
   if (await targetFile.exists()) {
     print('Serving data from $targetFile');
-    fileContent = (jsonDecode(await targetFile.readAsString()) as List<dynamic>)
-        .map((e) => CompanyContact.fromJson(e))
-        .toList();
+    fileContent = (jsonDecode(await targetFile.readAsString()) as List<dynamic>).map((e) => CompanyContact.fromJson(e)).toList();
   } else {
     print("$targetFile doesn't exists, stopping");
     exit(-1);
@@ -86,14 +87,10 @@ Future main() async {
     );
 
     try {
-      final offset =
-          int.parse(req.requestedUri.queryParameters['offset'] ?? '0');
-      final pageSize =
-          int.parse(req.requestedUri.queryParameters['pageSize'] ?? '10');
-      final sortIndex =
-          int.parse(req.requestedUri.queryParameters['sortIndex'] ?? '1');
-      final sortAsc =
-          int.parse(req.requestedUri.queryParameters['sortAsc'] ?? '1') == 1;
+      final offset = int.parse(req.requestedUri.queryParameters['offset'] ?? '0');
+      final pageSize = int.parse(req.requestedUri.queryParameters['pageSize'] ?? '10');
+      final sortIndex = int.parse(req.requestedUri.queryParameters['sortIndex'] ?? '1');
+      final sortAsc = int.parse(req.requestedUri.queryParameters['sortAsc'] ?? '1') == 1;
 
       fileContent.sort((a, b) => sortContacts(a, b, sortIndex, sortAsc));
       req.response.write(
